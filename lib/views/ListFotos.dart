@@ -25,7 +25,7 @@ class ListFotosState extends State<ListFotos>{
             child: CardFotos(fotos[index]),
             onDismissed: (direction) {
               setState(() {
-                fotos.removeAt(index);
+                fotos.single;
               });
             },
           );
