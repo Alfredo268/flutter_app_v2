@@ -24,7 +24,7 @@ class CardFotos extends StatelessWidget {
           padding(Text(fotos.title,style: TextStyle(fontSize: 18.0))),
           Row(children: <Widget>[
             padding(Icon(Icons.android_rounded)),
-            padding(Text(fotos.nombre,style: TextStyle(fontSize: 18.0)))
+            padding(Text(fotos.nombre,style: TextStyle(fontSize: 14.0)))
           ],)
         ],
       ),

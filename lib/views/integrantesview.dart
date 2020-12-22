@@ -10,9 +10,9 @@ class Fotos{
   Fotos(this.title,this.nombre,this.image,this.color);
 
   static List<Fotos> fotos() {
-    return [Fotos("Daniel Hernandez", "Vegano Developer", "img/toki.jpg", Colors.pink),
-      Fotos("Francisco Pinochet", "Mordisquito Developer", "img/pinokio.jpg",
+    return [Fotos("Daniel Hernandez", "Estudiante ing. Civil en Computación UTEM", "img/toki.jpg", Colors.pink),
+      Fotos("Francisco Pinochet", "Estudiante ing. Civil en Computación UTEM", "img/pinokio.jpg",
           Colors.lightBlueAccent),
-      Fotos("Alfredo Garces", "pulento", "img/alfred.jpg", Colors.black)];
+      Fotos("Alfredo Garces", "Estudiante ing. Civil en Computación UTEM", "img/alfred.jpg", Colors.black)];
   }
 }
