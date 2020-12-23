@@ -29,7 +29,13 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.1
   http: ^0.12.2
+  fl_chart: ^0.10.1
   select_form_field: "^1.1.0"
+  charts_flutter:
+  font_awesome_flutter:
+
+
+
 
 
 dev_dependencies:

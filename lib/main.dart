@@ -4,6 +4,8 @@ import 'menu.dart';
 import 'package:flutter_app_v2/views/ListFotos.dart';
 import 'package:flutter_app_v2/views/listviecountry.dart';
 import 'package:flutter_app_v2/views/integrantesview.dart';
+import 'package:flutter_app_v2/views/grafico.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -12,6 +14,7 @@ void main() {
 class MyApp extends StatelessWidget {
 
   @override
+  dynamic wea;
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter+Spring Boot API',

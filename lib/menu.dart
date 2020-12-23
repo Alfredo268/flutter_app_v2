@@ -5,7 +5,6 @@ import 'package:flutter_app_v2/views/ListFotos.dart';
 import 'package:flutter_app_v2/views/listviecountry.dart';
 import 'package:flutter_app_v2/views/integrantesview.dart';
 import 'package:flutter_app_v2/views/formulario.dart';
-
 class menu extends StatefulWidget{
   MenuState createState()=>MenuState();
   }
