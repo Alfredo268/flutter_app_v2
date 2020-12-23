@@ -13,20 +13,23 @@ class CardFotos extends StatelessWidget {
     // TODO: implement build
 
     return Card(
-      child: Column(
+
+      child: Row(
         children: <Widget>[
-          Container(
-            height: 144.0,
-            width: 500.0,
-            color: fotos.color,
-            child: Image.asset(fotos.image, height: 144.0, width: 160.0),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(15.0),
+            child: Image.asset(fotos.image, height: 110.0, width: 110.0,filterQuality: FilterQuality.high,fit: BoxFit.fill),
+
+
           ),
-          padding(Text(fotos.title,style: TextStyle(fontSize: 18.0))),
-          Row(children: <Widget>[
-            padding(Icon(Icons.android_rounded)),
-            padding(Text(fotos.nombre,style: TextStyle(fontSize: 14.0)))
+          Column(children: <Widget>[
+            padding(Text(fotos.title,style: TextStyle(fontSize: 18.0))),
+            padding(Text(fotos.nombre,style: TextStyle(fontSize: 12.0))),
           ],)
         ],
+
+
+
       ),
     );
   }
