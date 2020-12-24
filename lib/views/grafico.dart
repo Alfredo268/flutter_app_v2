@@ -1,153 +1,88 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
+
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   final String pais;
   final String pais2;
-  final int ano;
-  final int ano2;
-  final String indicador;
+  final String ano;
+  final String ano2;
+  final String indicadores;
   final Widget child;
 
-  HomePage(this.pais,this.pais2,this.ano,this.ano2,this.indicador,{Key key, this.child}) : super(key: key);
+//Petición post
 
+  Future<List<Sales>> JsonPost(String countryCode, int endYear,
+      String indicatorCode, int startYear) async {
+    Map data = {
+      'countryCode': '$countryCode',
+      'endYear': '$endYear',
+      'indicatorCode': '$indicatorCode',
+      "startYear": '$startYear',
+    };
+    final response = await http.post('http://10.0.2.2:8080/api/indicators/info',
+        headers: {"Content-Type": "application/json"}, body: json.encode(data));
+    List<Sales> data2 = [];
+
+    for (var json in json.decode(response.body)) {
+      data2.add(Sales(json["year"], json["value"]));
+    }
+    return data2;
+  }
+
+  HomePage(this.pais, this.pais2, this.ano, this.ano2, this.indicadores,
+      {Key key, this.child})
+      : super(key: key);
+  @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   TextEditingController pais;
   TextEditingController pais2;
-  List<charts.Series<Pollution, String>> _seriesData;
-  List<charts.Series<Task, String>> _seriesPieData;
-  List<charts.Series<Sales, int>> _seriesLineData;
+  TextEditingController indicadores;
+  TextEditingController ano;
+  TextEditingController ano2;
 
+  List<charts.Series<Sales, int>> _seriesLineData;
+  List data;
 
   _generateData() {
-    var data1 = [
-      new Pollution(1980, pais.text, 30),
-      new Pollution(1980, pais2.text, 40),
-    ];
-    var data2 = [
-      new Pollution(1985, pais.text, 100),
-      new Pollution(1980, pais2.text, 150),
-    ];
-    var data3 = [
-      new Pollution(1985, pais.text, 200),
-      new Pollution(1980, pais2.text, 300),
-    ];
+    List<Sales> linesalesdata = [];
+    List<Sales> linesalesdata1 = [];
+    var x = int.parse(ano.text);
+    var y = int.parse(ano2.text);
+    int d = y - x;
+    print(d);
+    int z = 30;
+    int k = 25;
+    for (var i = 0; i < d; i++) {
+      linesalesdata.add(Sales(i, z));
 
-    var piedata = [
-      new Task('Work', 35.8, Color(0xff3366cc)),
-      new Task('Eat', 8.3, Color(0xff990099)),
-      new Task('Commute', 10.8, Color(0xff109618)),
-      new Task('TV', 15.6, Color(0xfffdbe19)),
-      new Task('Sleep', 19.2, Color(0xffff9900)),
-      new Task('Other', 10.3, Color(0xffdc3912)),
-    ];
+      linesalesdata1.add(Sales(i, k));
+      z = z + 30;
+      k = k + 34;
+    }
 
-    var linesalesdata = [
-      new Sales(0, 45),
-      new Sales(1, 56),
-      new Sales(2, 55),
-      new Sales(3, 60),
-      new Sales(4, 61),
-      new Sales(5, 70),
-    ];
-    var linesalesdata1 = [
-      new Sales(0, 35),
-      new Sales(1, 46),
-      new Sales(2, 45),
-      new Sales(3, 50),
-      new Sales(4, 51),
-      new Sales(5, 60),
-    ];
-
-    var linesalesdata2 = [
-      new Sales(0, 20),
-      new Sales(1, 24),
-      new Sales(2, 25),
-      new Sales(3, 40),
-      new Sales(4, 45),
-      new Sales(5, 60),
-    ];
-
-    _seriesData.add(
+    _seriesLineData.add(
       charts.Series(
-        domainFn: (Pollution pollution, _) => pollution.place,
-        measureFn: (Pollution pollution, _) => pollution.quantity,
-        id: '2017',
-        data: data1,
-        fillPatternFn: (_, __) => charts.FillPatternType.solid,
-        fillColorFn: (Pollution pollution, _) =>
-            charts.ColorUtil.fromDartColor(Color(0xff990099)),
-      ),
-    );
-
-    _seriesData.add(
-      charts.Series(
-        domainFn: (Pollution pollution, _) => pollution.place,
-        measureFn: (Pollution pollution, _) => pollution.quantity,
-        id: '2018',
-        data: data2,
-        fillPatternFn: (_, __) => charts.FillPatternType.solid,
-        fillColorFn: (Pollution pollution, _) =>
-            charts.ColorUtil.fromDartColor(Color(0xff109618)),
-      ),
-    );
-
-    _seriesData.add(
-      charts.Series(
-        domainFn: (Pollution pollution, _) => pollution.place,
-        measureFn: (Pollution pollution, _) => pollution.quantity,
-        id: '2019',
-        data: data3,
-        fillPatternFn: (_, __) => charts.FillPatternType.solid,
-        fillColorFn: (Pollution pollution, _) =>
-            charts.ColorUtil.fromDartColor(Color(0xffff9900)),
-      ),
-    );
-
-    _seriesPieData.add(
-      charts.Series(
-        domainFn: (Task task, _) => task.task,
-        measureFn: (Task task, _) => task.taskvalue,
-        colorFn: (Task task, _) =>
-            charts.ColorUtil.fromDartColor(task.colorval),
+        colorFn: (__, _) => charts.ColorUtil.fromDartColor(Color(0xff990099)),
         id: 'Air Pollution',
-        data: piedata,
-        labelAccessorFn: (Task row, _) => '${row.taskvalue}',
+        data: linesalesdata,
+        domainFn: (Sales sales, _) => sales.yearval,
+        measureFn: (Sales sales, _) => sales.salesval,
       ),
     );
-
-
-
     _seriesLineData.add(
-    charts.Series(
-    colorFn: (__, _) => charts.ColorUtil.fromDartColor(Color(0xff990099)),
-    id: 'Air Pollution',
-    data: linesalesdata,
-    domainFn: (Sales sales, _) => sales.yearval,
-    measureFn: (Sales sales, _) => sales.salesval,
-    ),
-    );
-    _seriesLineData.add(
-    charts.Series(
-    colorFn: (__, _) => charts.ColorUtil.fromDartColor(Color(0xff109618)),
-    id: 'Air Pollution',
-    data: linesalesdata1,
-    domainFn: (Sales sales, _) => sales.yearval,
-    measureFn: (Sales sales, _) => sales.salesval,
-    ),
-    );
-    _seriesLineData.add(
-    charts.Series(
-    colorFn: (__, _) => charts.ColorUtil.fromDartColor(Color(0xffff9900)),
-    id: 'Air Pollution',
-    data: linesalesdata2,
-    domainFn: (Sales sales, _) => sales.yearval,
-    measureFn: (Sales sales, _) => sales.salesval,
-    ),
+      charts.Series(
+        colorFn: (__, _) => charts.ColorUtil.fromDartColor(Color(0xff109618)),
+        id: 'Air Pollution',
+        data: linesalesdata1,
+        domainFn: (Sales sales, _) => sales.yearval,
+        measureFn: (Sales sales, _) => sales.salesval,
+      ),
     );
   }
 
@@ -155,132 +90,52 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    pais=TextEditingController(text: widget.pais);
-    pais2=TextEditingController(text: widget.pais2);
-    _seriesData = List<charts.Series<Pollution, String>>();
-    _seriesPieData = List<charts.Series<Task, String>>();
+    indicadores = TextEditingController(text: widget.indicadores);
+    ano = TextEditingController(text: widget.ano);
+    ano2 = TextEditingController(text: widget.ano2);
+    pais = TextEditingController(text: widget.pais);
+    pais2 = TextEditingController(text: widget.pais2);
     _seriesLineData = List<charts.Series<Sales, int>>();
     _generateData();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Color(0xff1976d2),
-            //backgroundColor: Color(0xff308e1c),
-            bottom: TabBar(
-              indicatorColor: Color(0xff9962D0),
-              tabs: [
-                Tab(
-                  icon: Icon(FontAwesomeIcons.solidChartBar),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xff1976d2),
+        //backgroundColor: Color(0xff308e1c),
+        title: Text('Grafico de lineas'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Container(
+          child: Center(
+            child: Column(
+              children: <Widget>[
+                Text(
+                  indicadores.text,
+                  style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
                 ),
-                Tab(icon: Icon(FontAwesomeIcons.chartPie)),
-                Tab(icon: Icon(FontAwesomeIcons.chartLine)),
+                Expanded(
+                  child: charts.LineChart(_seriesLineData,
+                      defaultRenderer: new charts.LineRendererConfig(
+                          includeArea: true, stacked: true),
+                      animate: true,
+                      animationDuration: Duration(seconds: 5),
+                      behaviors: [
+                        new charts.ChartTitle('Año',
+                            behaviorPosition: charts.BehaviorPosition.bottom,
+                            titleOutsideJustification:
+                                charts.OutsideJustification.middleDrawArea),
+                        new charts.ChartTitle('Indicador',
+                            behaviorPosition: charts.BehaviorPosition.start,
+                            titleOutsideJustification:
+                                charts.OutsideJustification.middleDrawArea),
+                      ]),
+                ),
               ],
             ),
-            title: Text('Flutter Charts'),
-          ),
-          body: TabBarView(
-            children: [
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Container(
-                  child: Center(
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          'SO₂ emissions, by world region (in million tonnes)',style: TextStyle(fontSize: 24.0,fontWeight: FontWeight.bold),),
-                        Expanded(
-                          child: charts.BarChart(
-                            _seriesData,
-                            animate: true,
-                            barGroupingType: charts.BarGroupingType.grouped,
-                            //behaviors: [new charts.SeriesLegend()],
-                            animationDuration: Duration(seconds: 5),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Container(
-                  child: Center(
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          'Time spent on daily tasks',style: TextStyle(fontSize: 24.0,fontWeight: FontWeight.bold),),
-                        SizedBox(height: 10.0,),
-                        Expanded(
-                          child: charts.PieChart(
-                              _seriesPieData,
-                              animate: true,
-                              animationDuration: Duration(seconds: 5),
-                              behaviors: [
-                                new charts.DatumLegend(
-                                  outsideJustification: charts.OutsideJustification.endDrawArea,
-                                  horizontalFirst: false,
-                                  desiredMaxRows: 2,
-                                  cellPadding: new EdgeInsets.only(right: 4.0, bottom: 4.0),
-                                  entryTextStyle: charts.TextStyleSpec(
-                                      color: charts.MaterialPalette.purple.shadeDefault,
-                                      fontFamily: 'Georgia',
-                                      fontSize: 11),
-                                )
-                              ],
-                              defaultRenderer: new charts.ArcRendererConfig(
-                                  arcWidth: 100,
-                                  arcRendererDecorators: [
-                                    new charts.ArcLabelDecorator(
-                                        labelPosition: charts.ArcLabelPosition.inside)
-                                  ])),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Container(
-                  child: Center(
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          'Sales for the first 5 years',style: TextStyle(fontSize: 24.0,fontWeight: FontWeight.bold),),
-                        Expanded(
-                          child: charts.LineChart(
-                              _seriesLineData,
-                              defaultRenderer: new charts.LineRendererConfig(
-                                  includeArea: true, stacked: true),
-                              animate: true,
-                              animationDuration: Duration(seconds: 5),
-                              behaviors: [
-                                new charts.ChartTitle('Years',
-                                    behaviorPosition: charts.BehaviorPosition.bottom,
-                                    titleOutsideJustification:charts.OutsideJustification.middleDrawArea),
-                                new charts.ChartTitle('Sales',
-                                    behaviorPosition: charts.BehaviorPosition.start,
-                                    titleOutsideJustification: charts.OutsideJustification.middleDrawArea),
-                                new charts.ChartTitle('Departments',
-                                  behaviorPosition: charts.BehaviorPosition.end,
-                                  titleOutsideJustification:charts.OutsideJustification.middleDrawArea,
-                                )
-                              ]
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
           ),
         ),
       ),
@@ -310,3 +165,158 @@ class Sales {
 
   Sales(this.yearval, this.salesval);
 }
+
+/*
+  @override
+  Widget build(BuildContext context) {
+    List<Sales> data;
+    return FutureBuilder<List<Sales>>(
+      future: JsonPost("CL", 2019, "PIB", 2017),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text("Hubo un error");
+        } else if (snapshot.hasData) {
+          return Grafico(snapshot.data);
+        }
+      },
+    );
+  }
+}
+
+class Grafico extends StatelessWidget {
+  final List<Sales> data;
+
+  const Grafico(this.data);
+
+  _getSeriesData() {
+    List<charts.Series<Sales, int>> series = [
+      charts.Series(
+          id: "Values",
+          data: data,
+          domainFn: (Sales series, _) => series.yearval,
+          measureFn: (Sales series, _) => series.salesval,
+          colorFn: (Sales series, _) =>
+          charts.MaterialPalette.blue.shadeDefault
+      )
+    ];
+    return series;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Grafico"),
+      ),
+      body: Container(
+          child: new charts.LineChart(_getSeriesData(), animate: true, )
+      ),
+    );
+  }
+}
+
+class Sales {
+  int yearval;
+  int salesval;
+
+  Sales(this.yearval, this.salesval);
+}
+
+_generateData() {
+    var linesalesdata = JsonPost(pais.text, int.parse(ano2.text), indicadores.text, int.parse(ano.text));
+    var linesalesdata1 = JsonPost(pais2.text, int.parse(ano2.text), indicadores.text, int.parse(ano.text));
+
+    _seriesLineData.add(
+        charts.Series(
+          colorFn: (, _) => charts.ColorUtil.fromDartColor(Color(0xff990099)),
+    id: 'Air Pollution',
+    data: linesalesdata,
+    domainFn: (Sales sales, _) => sales.yearval,
+    measureFn: (Sales sales, _) => sales.salesval,
+    ),
+    );
+    _seriesLineData.add(
+    charts.Series(
+    colorFn: (, _) => charts.ColorUtil.fromDartColor(Color(0xff109618)),
+    id: 'Air Pollution',
+    data: linesalesdata1,
+    domainFn: (Sales sales, _) => sales.yearval,
+    measureFn: (Sales sales, _) => sales.salesval,
+    ),
+    );
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    indicadores = TextEditingController(text: widget.indicadores);
+    ano = TextEditingController(text: widget.ano);
+    ano2 = TextEditingController(text: widget.ano2);
+    pais = TextEditingController(text: widget.pais);
+    pais2 = TextEditingController(text: widget.pais2);
+    _seriesLineData = List<charts.Series<Sales, int>>();
+    _generateData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xff1976d2),
+        //backgroundColor: Color(0xff308e1c),
+        title: Text('Grafico de lineas'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Container(
+          child: Center(
+            child: Column(
+              children: <Widget>[
+                Text(
+                  indicadores.text,
+                  style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                ),
+                Expanded(
+                  child: charts.LineChart(_seriesLineData,
+                      defaultRenderer: new charts.LineRendererConfig(
+                          includeArea: true, stacked: true),
+                      animate: true,
+                      animationDuration: Duration(seconds: 5),
+                      behaviors: [
+                        new charts.ChartTitle('Año',
+                            behaviorPosition: charts.BehaviorPosition.bottom,
+                            titleOutsideJustification:
+                            charts.OutsideJustification.middleDrawArea),
+                        new charts.ChartTitle('Indicador',
+                            behaviorPosition: charts.BehaviorPosition.start,
+                            titleOutsideJustification:
+                            charts.OutsideJustification.middleDrawArea),
+                      ]),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Pollution {
+  String place;
+  int year;
+  int quantity;
+
+Pollution(this.year, this.place, this.quantity);
+}
+
+class Task {
+  String task;
+  double taskvalue;
+  Color colorval;
+
+  Task(this.task, this.taskvalue, this.colorval);
+}
+*/
+//INTENT DEL USAR LA INFO DE LA API
